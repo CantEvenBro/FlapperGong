@@ -31,8 +31,8 @@ namespace DiscordBot
         }
         public string AddUnit(string name,int x, int y)
         {
-            Unit newUnit = new Unit(name,2, 1, 0, 0, this, this.units.Count());
-            if (x< this.cellLength && y < this.cellLength && cellGrid[x][y].MoveUnit(ref newUnit))
+            Unit newUnit = new Unit(name,"purple",2, 1, 0, 0, this, this.units.Count());
+            if (x< this.cellLength && y < this.cellLength && cellGrid[x][y].MoveUnit(newUnit)) // changes on new unit will only happen to this version of that unit
             {
                 units.Add(newUnit);
                 newUnit.MoveUnit(x, y);
@@ -47,6 +47,7 @@ namespace DiscordBot
     }
     public class Unit
     {
+        public string colour;
         public int health;
         public string name;
         public int damage;
@@ -54,20 +55,21 @@ namespace DiscordBot
         public int y;
         public Game gameThisUnitIsPartOf;
         public int indexInGame;
-        public Unit(string name, int health,int damage,int x, int y, Game game, int index)
+        public Unit(string name, string colour, int health, int damage, int x, int y, Game game, int index)
         {
-              this.health = health;
-              this.name = name;
-              this.damage = damage;
-              this.x = x;
-              this.y = y;
+            this.health = health;
+            this.name = name;
+            this.colour = colour;
+            this.damage = damage;
+            this.x = x;
+            this.y = y;
             this.gameThisUnitIsPartOf = game;
-              this.indexInGame = index;
+            this.indexInGame = index;
 
         }
-        public bool AttackUnit( int x, int y)
+        public bool AttackUnit(int x, int y)
         {
-            if(gameThisUnitIsPartOf.cellGrid[x][y].unitOnCell!= null && gameThisUnitIsPartOf.cellGrid[x][y].unitOnCell != this)
+            if (gameThisUnitIsPartOf.cellGrid[x][y].unitOnCell != null && gameThisUnitIsPartOf.cellGrid[x][y].unitOnCell != this)
             {
                 gameThisUnitIsPartOf.cellGrid[x][y].unitOnCell.ChangeHealth(-1);
                 return true;
@@ -89,9 +91,15 @@ namespace DiscordBot
         {
             if (this.health > 0)
             {
+                if (this.gameThisUnitIsPartOf.cellGrid[x][y].MoveUnit(this))
+                {
 
-                this.x = x;
-                this.y = y;
+                    this.gameThisUnitIsPartOf.cellGrid[this.x][this.y].unitOnCell = null;
+                    this.x = x;
+                    this.y = y;
+                    this.gameThisUnitIsPartOf.cellGrid[x][y].unitOnCell = this;
+                    Console.WriteLine("Unit is moving" + x + "," + y + ". Old unit x,y is " + this.x + "," + this.y);
+                }
             }
         }
     }
@@ -105,12 +113,11 @@ namespace DiscordBot
             this.x = x;
             this.y = y;
         }
-        public bool MoveUnit(ref Unit unitMovingHere)
+        public bool MoveUnit(Unit unitMovingHere)
         {
-
             if (this.unitOnCell == null)
             {
-                this.unitOnCell = unitMovingHere;
+                Console.WriteLine("Cell at" + x + "," + y + "cell is free");
                 return true;
             }
             else
