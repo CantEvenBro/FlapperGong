@@ -18,6 +18,17 @@ public class Program
     }
     public async Task MainAsync()
     {
+        DiscordBot.Game game1 = new DiscordBot.Game(5);
+        Console.WriteLine("game1's gridsize is " + game1.cellLength);
+        Console.WriteLine("Game1 has " + game1.units.Count() + " units");
+        string cockmunch = "This is the value of cockmunch";
+        game1.AddUnit(cockmunch,1,3);
+
+        Console.WriteLine("Game1 NOW  has " + game1.units.Count() + " units");
+
+
+        Console.WriteLine("The first unit in game1's 'unit' List has the color " + game1.units[0].colour);
+        // Everything above here can be edited back to 20
         var _config = new DiscordSocketConfig { MessageCacheSize = 100 };
         _client = new DiscordSocketClient(_config);
         _client.Log += Log;
